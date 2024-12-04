@@ -12,7 +12,7 @@ This is a JavaScript source plugin for Evidence. It allows you to run arbitrary 
       evidence-connector-js: {}
     ```
 3. Launch the development server with `npm run dev` and navigate to the settings menu (localhost:3000/settings) to add a data source using this plugin.
-4. Create a new source in the sources directory with a .js file. The file should export a `data` object, e.g.
+4. Create a new source in the sources directory with a .js file like `hello.sql`. The JS file should export a `data` object.
     ```javascript
     export const data = [
       {
@@ -21,3 +21,9 @@ This is a JavaScript source plugin for Evidence. It allows you to run arbitrary 
       },
     ];
     ```
+5. You can then reference your data in markdown queries.
+    ````markdown
+    ```sql test
+    select * from hello
+    ```
+    ````
