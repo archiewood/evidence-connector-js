@@ -19,7 +19,8 @@
     "@evidence-dev/db-commons": "^1.0.1"
   },
   "evidence": {
-    "datasources": [ "js" ]
+    "datasources": [ "js" ],
+    "icon": "Javascript"
   },
   "keywords": [
     "evidence",

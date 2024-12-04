@@ -1,6 +1,12 @@
 import { EvidenceType } from "@evidence-dev/db-commons";
 
 /**
+ * @see https://docs.evidence.dev/plugins/create-source-plugin/#options-specification
+ * @see https://github.com/evidence-dev/evidence/blob/main/packages/postgres/index.cjs#L316
+ */
+export const options = {};
+
+/**
  * Implementing this function creates a "file-based" connector
  *
  * Each file in the source directory will be passed to this function, and it will return
