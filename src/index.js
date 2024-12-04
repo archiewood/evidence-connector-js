@@ -1,24 +1,4 @@
-/**
- * This type describes the options that your connector expects to recieve
- * This could include username + password, host + port, etc
- * @typedef {Object} ConnectorOptions
- * @property {string} SomeOption
- */
-
 import { EvidenceType } from "@evidence-dev/db-commons";
-
-/**
- * @see https://docs.evidence.dev/plugins/create-source-plugin/#options-specification
- * @see https://github.com/evidence-dev/evidence/blob/main/packages/postgres/index.cjs#L316
- */
-export const options = {
-  SomeOption: {
-    title: "Some Option",
-    description:
-      "This object defines how SomeOption should be displayed and configured in the Settings UI",
-    type: "string", // options: 'string' | 'number' | 'boolean' | 'select' | 'file'
-  },
-};
 
 /**
  * Implementing this function creates a "file-based" connector
@@ -33,73 +13,41 @@ export const options = {
 export const getRunner = (options) => {
   console.debug(`SomeOption = ${options.SomeOption}`);
 
-  // This function will be called for EVERY file in the sources directory
-  // If you are expecting a specific file type (e.g. SQL files), make sure to filter
-  // to exclude others.
-
-  // If you are using some local database file (e.g. a sqlite or duckdb file)
-  // You may also need to filter that file out as well
   return async (queryText, queryPath) => {
-    // Note: add your logic to process each file queryText and/or queryPath here
-    // ...
-    
-    // Example output, delete or modify as needed
-    const output = {
-      rows: [
-        { someInt: 1, someString: "string" },
-        { someInt: 2, someString: "string2" },
-      ],
-      columnTypes: [
-        {
-          name: "someInt",
-          evidenceType: EvidenceType.NUMBER,
-          typeFidelity: "inferred",
-        },
-        {
-          name: "someString",
-          evidenceType: EvidenceType.STRING,
-          typeFidelity: "inferred",
-        },
-      ],
-      expectedRowCount: 2,
-    };
+    // Check if the file is a JavaScript file
+    if (queryPath.endsWith(".js")) {
+      try {
+        // Dynamically import the JavaScript file
+        const module = await import(queryPath);
 
-    return output;
+        // Access the exported 'data' variable
+        const data = module.data;
+
+        // Extract column names from the first row
+        const columnNames = Object.keys(data[0]);
+
+        // Example output, modify as needed
+        const output = {
+          rows: data, // Assuming 'data' is an array of rows
+          columnTypes: columnNames.map((name) => ({
+            name,
+            evidenceType:
+              typeof data[0][name] === "number"
+                ? EvidenceType.NUMBER
+                : EvidenceType.STRING,
+            typeFidelity: "inferred",
+          })),
+          expectedRowCount: data.length,
+        };
+
+        return output;
+      } catch (error) {
+        console.error(`Failed to load or process file ${queryPath}:`, error);
+        throw error;
+      }
+    }
   };
 };
-
-// Uncomment to use the advanced source interface
-// This uses the `yield` keyword, and returns the same type as getRunner, but with an added `name` and `content` field (content is used for caching)
-// sourceFiles provides an easy way to read the source directory to check for / iterate through files
-// /** @type {import("@evidence-dev/db-commons").ProcessSource<ConnectorOptions>} */
-// export async function* processSource(options, sourceFiles, utilFuncs) {
-//   yield {
-//     title: "some_demo_table",
-//     content: "SELECT * FROM some_demo_table", // This is ONLY used for caching
-//     rows: [], // rows can be an array
-//     columnTypes: [
-//       {
-//         name: "someInt",
-//         evidenceType: EvidenceType.NUMBER,
-//         typeFidelity: "inferred",
-//       },
-//     ],
-//   };
-//   yield {
-//     title: "some_other_demo_table",
-//     content: "SELECT * FROM some_other_demo_table", // This is ONLY used for caching
-//     rows: async function* () {}, // rows can be a generator function for returning batches of results (e.g. if an API is paginated, or database supports cursors)
-//     columnTypes: [
-//       {
-//         name: "someOtherInt",
-//         evidenceType: EvidenceType.NUMBER,
-//         typeFidelity: "inferred",
-//       },
-//     ],
-//   };
-
-//  throw new Error("Process Source has not yet been implemented");
-// }
 
 /** @type {import("@evidence-dev/db-commons").ConnectionTester<ConnectorOptions>} */
 export const testConnection = async (opts) => {
