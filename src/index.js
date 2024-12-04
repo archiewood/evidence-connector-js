@@ -17,7 +17,6 @@ export const options = {};
  * @type {import("@evidence-dev/db-commons").GetRunner<ConnectorOptions>}
  */
 export const getRunner = (options) => {
-  console.debug(`SomeOption = ${options.SomeOption}`);
 
   return async (queryText, queryPath) => {
     // Check if the file is a JavaScript file
@@ -28,6 +27,8 @@ export const getRunner = (options) => {
 
         // Access the exported 'data' variable
         const data = module.data;
+
+        console.debug(data)
 
         // Extract column names from the first row
         const columnNames = Object.keys(data[0]);
