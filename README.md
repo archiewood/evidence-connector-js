@@ -1,6 +1,6 @@
 # Evidence JS Source Plugin
 
-This is a JavaScript source plugin for Evidence. It allows you to run arbitrary JavaScript code as a data source.
+This is a JavaScript source plugin for Evidence. It allows you to run arbitrary JavaScript code as a data source. It's meant to be a quick way to get data into Evidence without having to create a new connector.
 
 1. Install this plugin in an Evidence app with
     ```bash
