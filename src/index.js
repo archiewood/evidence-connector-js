@@ -1,4 +1,5 @@
 import { EvidenceType } from "@evidence-dev/db-commons";
+import { pathToFileURL } from 'url';
 
 /**
  * @see https://docs.evidence.dev/plugins/create-source-plugin/#options-specification
@@ -22,8 +23,8 @@ export const getRunner = (options) => {
     // Check if the file is a JavaScript file
     if (queryPath.endsWith(".js")) {
       try {
-        // Dynamically import the JavaScript file
-        const module = await import(queryPath);
+        // Convert the file path to a file URL
+        const module = await import(pathToFileURL(queryPath).href);
 
         // Access the exported 'data' variable
         const data = module.data;
